@@ -3,7 +3,7 @@ import { atom, selector } from 'recoil';
 export interface IToDo {
 	text: string;
 	id: number;
-	category: 'TO_DO' | 'DOING' | 'DONE';
+	category: string;
 }
 
 export let defaultCategories: string[] = ['TO_DO', 'DOING', 'DONE'];

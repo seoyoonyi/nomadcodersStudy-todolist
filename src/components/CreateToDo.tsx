@@ -1,25 +1,33 @@
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { useSetRecoilState } from 'recoil';
-import { toDoState } from '../context/atmos';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { categoryState, toDoState } from '../context/atmos';
 
-interface IForm {
+interface FormDataInterface {
 	toDo: string;
 }
 
 function CreateToDo() {
-	const setToDos = useSetRecoilState(toDoState);
-	const { register, handleSubmit, setValue } = useForm<IForm>();
-	const handleValid = ({ toDo }: IForm) => {
-		setToDos((oldToDos) => [{ text: toDo, id: Date.now(), category: 'TO_DO' }, ...oldToDos]);
+	const { register, handleSubmit, setValue } = useForm<FormDataInterface>();
+	const [toDos, setToDos] = useRecoilState(toDoState);
+	const category = useRecoilValue(categoryState);
+
+	const onValid = ({ toDo }: FormDataInterface) => {
 		setValue('toDo', '');
+		setToDos((current) => [{ text: toDo, category, id: Date.now() }, ...current]);
 	};
+
+	useEffect(() => {
+		localStorage.setItem('toDos', JSON.stringify(toDos));
+	}, [toDos]);
+
 	return (
-		<form onSubmit={handleSubmit(handleValid)}>
+		<form onSubmit={handleSubmit(onValid)}>
 			<input
 				{...register('toDo', {
 					required: 'Please write a To Do',
 				})}
-				placeholder="Write a to do"
+				placeholder={`${category} Write a to do`}
 			/>
 			<button>Add</button>
 		</form>
